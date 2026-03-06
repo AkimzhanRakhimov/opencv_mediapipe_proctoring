@@ -6,17 +6,12 @@ import time
 from timeit import default_timer as timer
 url="http://192.168.100.5:8080/video"
 
-cap=cv2.VideoCapture(url)
-time.sleep(2) 
+
 mp_face=mp.solutions.face_mesh
 face_mesh=mp_face.FaceMesh(refine_landmarks=True)
 NOSE,LEFT_EYE,RIGHT_EYE=1,234,454
 
-if not cap.isOpened():
-    print("Cannot open IP camera!")
-    exit()
-else:
-    print("okay")
+
 left_eye_points=[33,133,160,158,144]
 left_iris_points=[468,469,470,471,472]
 right_eye_points=[362,263,385,387,373]
@@ -91,6 +86,8 @@ def gaze_detection(lm):
 
 
 def generate_frames():
+    cap=cv2.VideoCapture(0)
+
     while True:
         
         ret,frame=cap.read()
@@ -173,7 +170,9 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'content-type:image/jpeg\r\n\r\n' + frame + b'\r\n')
         if cv2.waitKey(1)==27:
+            cap.release()
             break
+        
 
-cap.release()
+
 cv2.destroyAllWindows()
